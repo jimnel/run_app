@@ -16,8 +16,12 @@ python3 run.py
 
 ## Architecture
 
-- `calc.py` is the core. It holds the distance table (`distances`, in km) and the `Time` class, with helpers to convert to and from seconds. `Time.from_str` parses space-separated `"H M S"` input; trailing parts are optional, so `"1 30"` means 1h 30m. It validates with `assert`. `time_per_k(time, dist)` returns pace as a `Time`.
-- `funcs.py` holds the user-facing operations, which print their results rather than returning them. `target_and_distance(time_str, d_str)` takes the **raw time string** and parses it itself. `pace_and_distance` is a work in progress: it currently ignores its arguments and uses hard-coded values.
+- `calc.py` is the core. It has two time classes, and both roll excess seconds and minutes over into the next unit when constructed:
+  - `RaceTime(hours, mins, secs)` is a total race time. `RaceTime.from_str` parses space-separated `"H M S"` input; trailing parts are optional, so `"1 30"` means 1h 30m and `"50"` means 50 hours.
+  - `TimePerKm(mins, secs)` is a pace. Its `from_str` takes exactly `"M S"`.
+  - `time_per_k(race_time, dist)` returns a `TimePerKm`.
+  - Input is validated with `assert`.
+- `funcs.py` holds the distance table (`distances`, keyed by `5k`/`10k`/`half`/`full`) and the user-facing operations, which print their results rather than returning them. `target_and_distance(time_str, d_str)` takes the **raw time string** and parses it itself. `pace_and_distance` is a work in progress: it currently ignores its arguments and uses a hard-coded 4m 59s pace over the full marathon.
 - `run.py` collects the input and calls into `funcs`.
 - `notebook.ipynb` is a scratchpad for trying out parsing logic. It is not imported anywhere.
 

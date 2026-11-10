@@ -1,4 +1,4 @@
-from math import floor, ceil
+from math import floor
 import re
 
 class RaceTime:
@@ -47,10 +47,10 @@ class RaceTime:
 
 class TimePerKm:
     def __init__(self, mins: int, secs: int):
-        if mins >= 60:
-            n = floor(mins/60)
-            hours += n
-            mins -= n * 60
+        if secs >= 60:
+            n = floor(secs/60)
+            mins += n
+            secs -= n * 60
 
         self.mins = mins
         self.secs = secs
