@@ -1,4 +1,4 @@
-import calc
+from . import calc
 
 HM_DIST = 21.0975
 FM_DIST = 42.195
