@@ -11,17 +11,25 @@ distances = {
 }
 
 def target_and_distance(time_str, d_str):
-    assert d_str in distances.keys()
-    print(f"Distance: {d_str}")
+    """Work out the pace needed to finish a race within a target time.
 
+    Args:
+        time_str: Target time as space-separated "H M S"; trailing parts are
+            optional, so "1 30" means 1h 30m.
+        d_str: Distance key from `distances` ("5k", "10k", "half", "full").
+
+    Returns:
+        A tuple (pace, actual_time): the pace per km as a `calc.TimePerKm`,
+        and the finish time from holding that pace as a `calc.RaceTime`.
+        The pace is rounded down to whole seconds on purpose, so actual_time
+        is always at or under the target.
+    """
+    assert d_str in distances.keys()
     time = calc.RaceTime.from_str(time_str)
-    print("Target Time:", time)
 
     tpk = calc.time_per_k(time, distances[d_str])
-    print(f"Time per k: {tpk}")
-
-    time = calc.RaceTime.from_secs(tpk.to_secs() * distances[d_str])
-    print("Actual Time:", time)
+    true_time = calc.RaceTime.from_secs(tpk.to_secs() * distances[d_str])
+    return tpk, true_time
 
 
 def pace_and_distance(time, d_str):
