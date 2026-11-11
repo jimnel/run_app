@@ -21,8 +21,8 @@ python3 run.py
   - `TimePerKm(mins, secs)` is a pace. Its `from_str` takes exactly `"M S"`.
   - `time_per_k(race_time, dist)` returns a `TimePerKm`.
   - Input is validated with `assert`.
-- `funcs.py` holds the distance table (`distances`, keyed by `5k`/`10k`/`half`/`full`) and the user-facing operations, which print their results rather than returning them. `target_and_distance(time_str, d_str)` takes the **raw time string** and parses it itself. `pace_and_distance` is a work in progress: it currently ignores its arguments and uses a hard-coded 4m 59s pace over the full marathon.
-- `run.py` collects the input and calls into `funcs`.
+- `funcs.py` holds the distance table (`distances`, keyed by `5k`/`10k`/`half`/`full`) and the calculations. `target_and_distance(time_str, d_str)` takes the **raw time string**, parses it itself, and returns `(TimePerKm pace, RaceTime actual_time)` without printing anything. The pace is rounded down to whole seconds on purpose, so the actual time is always at or under the target; keep that guarantee if you change the maths. `pace_and_distance` is a work in progress: it currently ignores its arguments and uses a hard-coded 4m 59s pace over the full marathon.
+- `run.py` collects the input, calls into `funcs`, and does all the printing.
 - `notebook.ipynb` is a scratchpad for trying out parsing logic. It is not imported anywhere.
 
 All distances are in kilometres, and all time arithmetic goes through total seconds (`to_secs` / `from_secs`).
