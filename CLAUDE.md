@@ -8,8 +8,10 @@ A small Python 3 running-pace calculator: given a race distance and a target tim
 
 ## Running
 
+The project is managed with uv (`pyproject.toml`, Python >= 3.13):
+
 ```
-python3 run.py
+uv run run.py
 ```
 
 `run.py` is an interactive CLI. It prompts for a distance key (`5k`, `10k`, `half`, `full`) and then a time.

@@ -1,0 +1,6 @@
+[project]
+name = "run-app"
+version = "0.1.0"
+description = "Running pace calculator"
+requires-python = ">=3.13"
+dependencies = []
