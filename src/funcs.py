@@ -10,12 +10,11 @@ distances = {
     "full": FM_DIST,
 }
 
-def target_and_distance(time_str, d_str):
+def target_and_distance(time, d_str):
     """Work out the pace needed to finish a race within a target time.
 
     Args:
-        time_str: Target time as space-separated "H M S"; trailing parts are
-            optional, so "1 30" means 1h 30m.
+        time: Target time as a `calc.RaceTime`.
         d_str: Distance key from `distances` ("5k", "10k", "half", "full").
 
     Returns:
@@ -25,7 +24,6 @@ def target_and_distance(time_str, d_str):
         is always at or under the target.
     """
     assert d_str in distances.keys()
-    time = calc.RaceTime.from_str(time_str)
 
     tpk = calc.time_per_k(time, distances[d_str])
     true_time = calc.RaceTime.from_secs(tpk.to_secs() * distances[d_str])
