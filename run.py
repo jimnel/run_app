@@ -1,4 +1,4 @@
-from funcs import target_and_distance
+from src.funcs import target_and_distance
 
 print("Enter a distance: 5k, 10k, half, full")
 dist = input("> ")  # Python 3
