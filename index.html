@@ -31,6 +31,7 @@
     #out dl { display: grid; grid-template-columns: auto 1fr; gap: .25rem 1rem; margin: 0; }
     #out dt { color: var(--muted); }
     #out dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+    #out .subhead { margin: 1.5rem 0 .5rem; font-weight: 600; }
     .error { color: var(--err); }
   </style>
 </head>
@@ -86,8 +87,10 @@ def show_error(msg):
     out.append(p)
 
 
-def show_result(rows):
-    out.textContent = ""
+DISTANCE_NAMES = {"5k": "5k", "10k": "10k", "half": "Half marathon", "full": "Marathon"}
+
+
+def make_list(rows):
     dl = document.createElement("dl")
     for label, value in rows:
         dt = document.createElement("dt")
@@ -95,7 +98,16 @@ def show_result(rows):
         dd = document.createElement("dd")
         dd.textContent = value
         dl.append(dt, dd)
-    out.append(dl)
+    return dl
+
+
+def show_result(rows, other_distances):
+    out.textContent = ""
+    out.append(make_list(rows))
+    intro = document.createElement("p")
+    intro.className = "subhead"
+    intro.textContent = "At this pace you would run:"
+    out.append(intro, make_list(other_distances))
 
 
 @when("submit", "#form")
@@ -120,11 +132,16 @@ def calculate(event):
         return
 
     pace, actual = target_and_distance(target, dist)
+    # Same maths as target_and_distance: the floored pace held over each distance.
+    at_pace = [
+        (DISTANCE_NAMES[key], str(RaceTime.from_secs(pace.to_secs() * km)))
+        for key, km in distances.items()
+    ]
     show_result([
         ("Target time", str(target)),
         ("Pace per km", str(pace)),
         ("Actual time", str(actual)),
-    ])
+    ], at_pace)
 
 
 go = document.querySelector("#go")
