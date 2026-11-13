@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pace Calculator</title>
+  <!-- PyScript pinned to an exact release; bump deliberately, never use "latest". -->
+  <link rel="stylesheet" href="https://pyscript.net/releases/2026.7.3/core.css">
+  <script type="module" src="https://pyscript.net/releases/2026.7.3/core.js"></script>
+  <style>
+    :root { --bg: #fafaf9; --fg: #1c1917; --muted: #78716c; --line: #d6d3d1; --accent: #2563eb; --err: #b91c1c; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #1c1917; --fg: #f5f5f4; --muted: #a8a29e; --line: #44403c; --accent: #60a5fa; --err: #f87171; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, sans-serif; }
+    main { max-width: 26rem; margin: 3rem auto; padding: 0 16px; }
+    h1 { font-size: 1.5rem; margin: 0 0 1.5rem; }
+    label { display: block; font-weight: 600; margin: 1rem 0 .25rem; }
+    .hint { color: var(--muted); font-size: .875rem; font-weight: 400; }
+    select, input, button { width: 100%; font: inherit; padding: .6rem .75rem; border-radius: 8px;
+      border: 1px solid var(--line); background: transparent; color: inherit; }
+    button { margin-top: 1.5rem; background: var(--accent); color: #fff; border: 0; cursor: pointer; }
+    button:disabled { opacity: .5; cursor: wait; }
+    #out { margin-top: 1.5rem; min-height: 3rem; }
+    #out dl { display: grid; grid-template-columns: auto 1fr; gap: .25rem 1rem; margin: 0; }
+    #out dt { color: var(--muted); }
+    #out dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .error { color: var(--err); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Pace calculator</h1>
+    <form id="form">
+      <label for="dist">Distance</label>
+      <select id="dist">
+        <option value="5k">5k</option>
+        <option value="10k">10k</option>
+        <option value="half">Half marathon</option>
+        <option value="full">Marathon</option>
+      </select>
+
+      <label for="time">Target time <span class="hint">hours minutes seconds, e.g. <code>1 30</code> or <code>0 25 0</code></span></label>
+      <input id="time" inputmode="numeric" autocomplete="off" required placeholder="H M S">
+
+      <button id="go" type="submit" disabled>Loading…</button>
+    </form>
+    <div id="out" aria-live="polite"></div>
+  </main>
+
+  <script type="py" config='{"files": {"./src/__init__.py": "./src/__init__.py", "./src/calc.py": "./src/calc.py", "./src/funcs.py": "./src/funcs.py"}}'>
+from pyscript import document, when
+from src.calc import RaceTime
+from src.funcs import target_and_distance, distances
+
+out = document.querySelector("#out")
+
+
+def show_error(msg):
+    # textContent only: never inject user-influenced text as HTML.
+    out.textContent = ""
+    p = document.createElement("p")
+    p.className = "error"
+    p.textContent = msg
+    out.append(p)
+
+
+def show_result(rows):
+    out.textContent = ""
+    dl = document.createElement("dl")
+    for label, value in rows:
+        dt = document.createElement("dt")
+        dt.textContent = label
+        dd = document.createElement("dd")
+        dd.textContent = value
+        dl.append(dt, dd)
+    out.append(dl)
+
+
+@when("submit", "#form")
+def calculate(event):
+    event.preventDefault()
+    dist = document.querySelector("#dist").value
+    raw = document.querySelector("#time").value.strip()
+
+    if dist not in distances:
+        show_error("Pick a distance from the list.")
+        return
+    try:
+        target = RaceTime.from_str(raw)
+    except (AssertionError, ValueError):
+        show_error("Enter the time as up to three numbers: hours, minutes, seconds.")
+        return
+    if target.to_secs() == 0:
+        show_error("The target time must be more than zero.")
+        return
+
+    pace, actual = target_and_distance(target, dist)
+    show_result([
+        ("Target time", str(target)),
+        ("Pace per km", str(pace)),
+        ("Actual time", str(actual)),
+    ])
+
+
+go = document.querySelector("#go")
+go.disabled = False
+go.textContent = "Calculate"
+  </script>
+</body>
+</html>
